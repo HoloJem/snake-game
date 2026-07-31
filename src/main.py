@@ -17,6 +17,17 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT:
+                snake.change_direction('right')
+            elif event.key == pygame.K_LEFT:
+                snake.change_direction('left')
+            elif event.key == pygame.K_UP:
+                snake.change_direction('up')
+            elif event.key == pygame.K_DOWN:
+                snake.change_direction('down')
+
+
 #UPDATE
     screen.fill((0,0,0))
     snake.update()

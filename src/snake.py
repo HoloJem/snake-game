@@ -15,4 +15,6 @@ class Snake(GameObject):
             self.y -= self.speed
         elif self.direction == 'down':
             self.y += self.speed
+    def change_direction(self, direction):
+        self.direction = direction
 
