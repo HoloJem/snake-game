@@ -19,6 +19,7 @@ while running:
             running = False
 #UPDATE
     screen.fill((0,0,0))
+    snake.update()
     snake.draw(screen)
 
 #DRAW    
