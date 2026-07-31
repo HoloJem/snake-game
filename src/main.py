@@ -1,11 +1,11 @@
-from game_object import GameObject
+from snake import Snake
 import pygame
 
 pygame.init()
 
 screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Snake")
-snake_head = GameObject(100,100,50,50,(255,255,255))
+snake = Snake(100,100)
 
 clock = pygame.time.Clock()
 pygame.time.wait(1600)
@@ -19,7 +19,7 @@ while running:
             running = False
 #UPDATE
     screen.fill((0,0,0))
-    snake_head.draw(screen)
+    snake.draw(screen)
 
 #DRAW    
     pygame.display.flip()
