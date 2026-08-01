@@ -26,8 +26,10 @@ for y in range(0, SCREEN_HEIGHT, SEGMENT_SIZE):
     walls.append(Wall(SCREEN_WIDTH - SEGMENT_SIZE, y, SEGMENT_SIZE, SEGMENT_SIZE))
 
 
+#this is to allow the player a moment to get their bearings.
 clock = pygame.time.Clock()
 pygame.time.wait(1600)
+
 
 
 running = True

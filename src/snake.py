@@ -1,7 +1,7 @@
 import pygame
 from game_object import GameObject
 import time
-from settings import SEGMENT_SIZE, OBJECT_COLOR
+from settings import SEGMENT_SIZE, OBJECT_COLOR, MOVEMENT_DELAY
 
 class Snake(GameObject):
     def __init__(self, x, y):
@@ -9,7 +9,7 @@ class Snake(GameObject):
         super().__init__(x,y,SEGMENT_SIZE,SEGMENT_SIZE,OBJECT_COLOR)
         self.direction = 'right'
         self.last_movement_time=time.time()
-        self.movement_delay=0.2
+        self.movement_delay=MOVEMENT_DELAY
         self.body = [
             (x,y),
             (x-SEGMENT_SIZE,y),
