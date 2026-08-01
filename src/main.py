@@ -34,7 +34,9 @@ pygame.time.wait(1600)
 
 running = True
 fruit_exists = False
+
 while running:
+    
 #INPUT
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
