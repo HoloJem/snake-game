@@ -10,7 +10,7 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Snake")
 
-snake = Snake(100,100)
+snake = Snake(150,150)
 
 #generating the boundaries of the arena, the "walls".
 walls = []
@@ -56,11 +56,21 @@ while running:
 
 #UPDATE
     screen.fill((0,0,0))
-    snake.update()
+    if snake.head_as_rect().colliderect(fruit.rect):
+        snake.grow()
+        fruit_exists=False
+    else:
+        snake.update()
+    for wall in walls:
+        if snake.head_as_rect().colliderect(wall.rect):
+            running = False
     snake.draw(screen)
     for wall in walls : 
         wall.draw(screen)
     fruit.draw(screen)
+    if snake.collide_self():
+        running = False
+    
 #DRAW    
     pygame.display.flip()
     

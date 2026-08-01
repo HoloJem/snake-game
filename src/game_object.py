@@ -19,3 +19,6 @@ class GameObject:
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
 
+    def collide_with(self, other):
+        return self.rect.colliderect(other.rect)
+    

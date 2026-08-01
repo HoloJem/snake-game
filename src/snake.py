@@ -15,13 +15,8 @@ class Snake(GameObject):
             (x-SEGMENT_SIZE,y),
             (x-2*SEGMENT_SIZE,y)
         ]
-    
-    def update(self):
-        if time.time() - self.last_movement_time < self.movement_delay:
-            return
-
-        self.last_movement_time=time.time()
-         
+        self.growth=False
+    def move(self):
         head_x, head_y = self.body[0]
 
         if self.direction == 'right':
@@ -34,10 +29,23 @@ class Snake(GameObject):
             head_y += SEGMENT_SIZE
         
         self.body.insert(0,(head_x, head_y))
-        self.body.pop()
-
+    def update(self):
+        if time.time() - self.last_movement_time < self.movement_delay:
+            return
+        self.last_movement_time=time.time()
+        self.move()
+        if self.growth:
+            self.growth = False
+        else:
+            self.body.pop()
+    def head_as_rect(self):
+        return pygame.Rect(self.body[0][0], self.body[0][1], SEGMENT_SIZE, SEGMENT_SIZE)
     def change_direction(self, direction):
         self.direction = direction
     def draw(self, screen):
         for segment in self.body:
             pygame.draw.rect(screen, OBJECT_COLOR, (segment[0],segment[1],50,50))
+    def collide_self(self):
+        return self.body[0] in self.body[1:]
+    def grow(self):
+        self.growth=True
