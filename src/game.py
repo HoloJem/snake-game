@@ -5,7 +5,7 @@ from snake import Snake
 from wall import Wall
 from fruit import Fruit
 
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, SEGMENT_SIZE
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, SEGMENT_SIZE, random_color
 
 class Game:
     def __init__(self):
@@ -15,15 +15,18 @@ class Game:
         pygame.display.set_caption("Snake")
         
         self.clock = pygame.time.Clock()
-        
-        self.snake = Snake(150,150)
 
+        self.font = pygame.font.Font(None,36)
+        self.score = 0
+        self.score_color=random_color()
         self.walls = []
-
         self.create_walls()
 
         self.fruit = None
         self.spawn_fruit()
+        self.snake = Snake(150,150)
+
+
 
     def create_walls(self):
         for x in range(0, SCREEN_WIDTH, SEGMENT_SIZE):
@@ -38,6 +41,11 @@ class Game:
         x = random.randrange(SEGMENT_SIZE, SCREEN_WIDTH-SEGMENT_SIZE, SEGMENT_SIZE)
         y = random.randrange(SEGMENT_SIZE, SCREEN_HEIGHT-SEGMENT_SIZE, SEGMENT_SIZE)
         self.fruit = Fruit(x,y)
+
+    def show_score(self):
+        text = self.font.render(f"Score:{self.score}",True,self.score_color)
+        self.screen.blit(text,(10,10))
+        
 
     def event_handler(self):
         for event in pygame.event.get():
@@ -58,13 +66,14 @@ class Game:
 
 
     def update(self):
-        if self.snake.collide_self:
+        if self.snake.collide_self():
             self.running=False
         for wall in self.walls:
             if self.snake.head_as_rect().colliderect(wall.rect):
                 self.running=False
         if self.snake.head_as_rect().colliderect(self.fruit.rect):
             self.snake.grow()
+            self.score += 1
             self.spawn_fruit()
         else: 
             self.snake.update()
@@ -78,10 +87,12 @@ class Game:
 
         self.fruit.draw(self.screen)
 
+        self.show_score()
+
         pygame.display.flip()
 
     def run(self):
-        while True:
+        while self.running:
             self.event_handler()
             self.update()
             self.draw()
