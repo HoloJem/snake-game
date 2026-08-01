@@ -3,18 +3,34 @@ from game_object import GameObject
 
 class Snake(GameObject):
     def __init__(self, x, y):
-        super().__init__(x,y,50,50,(255,255,255))
+        self.color=(255,255,255)
+        super().__init__(x,y,50,50,self.color)
         self.speed = 5
         self.direction = 'right'
+
+        self.body = [
+            (x,y),
+            (x-50,y),
+            (x-100,y)
+        ]
+    
     def update(self):
+        head_x, head_y = self.body[0]
+
         if self.direction == 'right':
-            self.x += self.speed
+            head_x += self.speed
         elif self.direction == 'left':
-            self.x -= self.speed
+            head_x -= self.speed
         elif self.direction == 'up':
-            self.y -= self.speed
+            head_y -= self.speed
         elif self.direction == 'down':
-            self.y += self.speed
+            head_y += self.speed
+        
+        self.body.insert(0,(head_x, head_y))
+        self.body.pop()
+
     def change_direction(self, direction):
         self.direction = direction
-
+    def draw(self, screen):
+        for segment in self.body:
+            pygame.draw.rect(screen, self.color, (segment[0],segment[1],50,50))
