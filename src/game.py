@@ -11,12 +11,14 @@ class Game:
     def __init__(self):
         self.running = True
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        
+        self.tombstone = pygame.image.load("assets/tombstone.jpg").convert()
         pygame.display.set_caption("Snake")
-        
         self.clock = pygame.time.Clock()
-
         self.font = pygame.font.Font(None,36)
+        self.smallfont = pygame.font.Font(None,18)
+
+
+        self.game_over = False
         self.score = 0
         self.score_color=random_color()
         self.walls = []
@@ -43,7 +45,7 @@ class Game:
         self.fruit = Fruit(x,y)
 
     def show_score(self):
-        text = self.font.render(f"Score:{self.score}",True,self.score_color)
+        text = self.font.render(f"Score: {self.score}",True,self.score_color)
         self.screen.blit(text,(10,10))
         
 
@@ -67,10 +69,10 @@ class Game:
 
     def update(self):
         if self.snake.collide_self():
-            self.running=False
+            self.game_over=True
         for wall in self.walls:
             if self.snake.head_as_rect().colliderect(wall.rect):
-                self.running=False
+                self.game_over=True
         if self.snake.head_as_rect().colliderect(self.fruit.rect):
             self.snake.grow()
             self.score += 1
@@ -79,21 +81,43 @@ class Game:
             self.snake.update()
 
     def draw(self):
-        self.screen.fill((0,0,0))
-        self.snake.draw(self.screen)
+        if self.game_over:
+            self.show_game_over()
+        else:
+            self.screen.fill((0,0,0))
+            self.snake.draw(self.screen)
 
-        for wall in self.walls:
-            wall.draw(self.screen)
+            for wall in self.walls:
+                wall.draw(self.screen)
 
-        self.fruit.draw(self.screen)
+            self.fruit.draw(self.screen)
 
-        self.show_score()
+            self.show_score()
 
         pygame.display.flip()
 
+    def show_game_over(self):
+        self.screen.fill((0,0,0))
+        self.screen.blit(self.tombstone, (233,0))
+        score_text = self.smallfont.render(f"Your high score was {self.score}", True, (0,0,0))
+        thanks_text = self.smallfont.render(f"Thank you for playing my game.", True, (0,0,0))
+        quit_text = self.smallfont.render(f"Press any key to exit.", True, (0,0,0))
+        self.screen.blit(score_text, (355, 325))
+        self.screen.blit(thanks_text, (355, 350))
+        self.screen.blit(quit_text, (355, 375))
+
+    def death_check(self):
+        if self.game_over:
+            event = pygame.event.wait()
+            if event.type == pygame.KEYDOWN:
+                self.running = False
+
+            
     def run(self):
         while self.running:
+            self.death_check()
             self.event_handler()
             self.update()
             self.draw()
             self.clock.tick(60)
+
