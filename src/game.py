@@ -18,6 +18,7 @@ from settings import SCREEN_WIDTH, SCREEN_HEIGHT, SEGMENT_SIZE, SNAKE_START_LOCA
 # Then we create an empty list called walls, and run the create walls function, which populates walls with a list of Wall objects.
 # We initialize self.fruit, then call the spawn_fruit function, which creates a fruit object.
 # We initialize a snake object as well. With a battlefield, a snake, walls, and a fruit, the game is set at this point.
+# finally we start the mixer, give it our sound effect "oof.mp3" saved for later as death_sound, give it our song alexei.mp3, set the volume at a cool 40%, and loop it.
 
 class Game:
     def __init__(self):
@@ -34,10 +35,13 @@ class Game:
         self.score_color=random_color()
         self.walls = []
         self.create_walls()
-
         self.fruit = None
         self.spawn_fruit()
         self.snake = Snake(SNAKE_START_LOCATION)
+        self.death_sound = pygame.mixer.Sound("assets/ouch.wav")
+        pygame.mixer.music.load("assets/alexei.mp3")
+        pygame.mixer.music.set_volume(0.4)
+        pygame.mixer.music.play(-1)
 
 #The create walls function is a helper function for easier readability. Each wall is actually as many 'rectangular segments' as can fit into the screen. First top and bottom
 # then left and right walls.
@@ -76,21 +80,30 @@ class Game:
                 elif event.key == pygame.K_DOWN:
                     self.snake.change_direction("down")
 
+#a helper function to compress the code a little. Plays a sound, stops the music..
+    def die_snake(self):
+        self.game_over=True
+        pygame.mixer.music.stop()
+        self.death_sound.play()
+
 # The update function. First htis checks for collisions in the current game state of the world. Did the head hit the body? Did the head hit the walls? If so,
 # we set the game_over tag to true. If the snake head collided with fruit, then we run the setter function for the growth flag, increase score by 1, and spawn a new fruit.
 # If we didnt hit the fruit, then we just update the snake. Easy.
     def update(self):
         if self.snake.collide_self():
-            self.game_over=True
+            self.die_snake()
         for wall in self.walls:
             if self.snake.head_as_rect().colliderect(wall.rect):
-                self.game_over=True
+                self.die_snake()
         if self.snake.head_as_rect().colliderect(self.fruit.rect):
             self.snake.grow()
             self.score += 1
             self.spawn_fruit()
         else: 
             self.snake.update()
+
+
+
 
 # The draw function first sets the data to display to user, and then at the very end uses display.flip to render that data to a visible format.
 # First things first, if the game_over flag is set, we jump straight to show_game_over(). That function will be discussed later. For now, 

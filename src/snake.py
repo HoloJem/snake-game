@@ -2,7 +2,7 @@
 import pygame
 from game_object import GameObject
 import time
-from settings import SEGMENT_SIZE, OBJECT_COLOR, MOVEMENT_DELAY
+from settings import SEGMENT_SIZE, OBJECT_COLOR, MOVEMENT_DELAY,SNAKE_COLOR
 
 # Snake class. For the snake object the player controls. 
 # initializes as a game object with location, witdth and height SEGMENT_SIZE, and color OBJECT_COLOR.
@@ -17,7 +17,7 @@ class Snake(GameObject):
     def __init__(self, position):
         x = position[0]
         y = position[1]
-        super().__init__(x,y,SEGMENT_SIZE,SEGMENT_SIZE,OBJECT_COLOR)
+        super().__init__(x,y,SEGMENT_SIZE,SEGMENT_SIZE,SNAKE_COLOR)
         self.direction = 'right'
         self.last_movement_time=time.time()
         self.movement_delay=MOVEMENT_DELAY
@@ -80,7 +80,7 @@ class Snake(GameObject):
 # Pygames rectangle class's built in draw function.        
     def draw(self, screen):
         for segment in self.body:
-            pygame.draw.rect(screen, OBJECT_COLOR, (segment[0],segment[1],SEGMENT_SIZE,SEGMENT_SIZE))
+            pygame.draw.rect(screen, self.color, (segment[0],segment[1],SEGMENT_SIZE,SEGMENT_SIZE))
 
 # Collide_self checks if the snake's head segment, is inside the list body [1,....]. It returns true or false.
     def collide_self(self):

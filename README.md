@@ -16,6 +16,8 @@ All development was completed on Windows 11, Pygame 2.6.1, Python 3.12
 use command:
 Python src/main.py
 
+#All Music
+was performed and this use was licensed by Alex McCulloch. 
 
 #Controls
 All control will be done with the Arrow Keys. Avoid obstacles and yourself while eating fruit in your quest for the highest score!
