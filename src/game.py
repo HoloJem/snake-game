@@ -1,3 +1,4 @@
+# importing everything we need, pygame and random, Snake, Wall, Fruit, some constants, and my random_color() function.
 import pygame
 import random
 
@@ -5,7 +6,18 @@ from snake import Snake
 from wall import Wall
 from fruit import Fruit
 
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, SEGMENT_SIZE, random_color
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, SEGMENT_SIZE, SNAKE_START_LOCATION, FONT_COLOR, BACKGROUND_COLOR, random_color
+
+# Game is the actual game that main will call. Going through the variables one by one... Running flag allows the game loop to continue.
+# screen is the screen that pygame is rendering to user.
+# tombstone is a placeholder for a game over image I will show to the user later.
+# Then we set the window title to Snake, create a clock to help with fps, and create two fonts. A big one for score, and a small one for game over.
+# The gameover boolean is used for a conditional later: Render the game world, or render the game over screen?
+# Score is an integer that increases with every fruit eaten.
+# The score can be almost any color. I thought this would be fun.
+# Then we create an empty list called walls, and run the create walls function, which populates walls with a list of Wall objects.
+# We initialize self.fruit, then call the spawn_fruit function, which creates a fruit object.
+# We initialize a snake object as well. With a battlefield, a snake, walls, and a fruit, the game is set at this point.
 
 class Game:
     def __init__(self):
@@ -17,7 +29,6 @@ class Game:
         self.font = pygame.font.Font(None,36)
         self.smallfont = pygame.font.Font(None,18)
 
-
         self.game_over = False
         self.score = 0
         self.score_color=random_color()
@@ -26,10 +37,10 @@ class Game:
 
         self.fruit = None
         self.spawn_fruit()
-        self.snake = Snake(150,150)
+        self.snake = Snake(SNAKE_START_LOCATION)
 
-
-
+#The create walls function is a helper function for easier readability. Each wall is actually as many 'rectangular segments' as can fit into the screen. First top and bottom
+# then left and right walls.
     def create_walls(self):
         for x in range(0, SCREEN_WIDTH, SEGMENT_SIZE):
             self.walls.append(Wall(x,0,SEGMENT_SIZE,SEGMENT_SIZE))
@@ -38,17 +49,19 @@ class Game:
         for y in range(0, SCREEN_HEIGHT, SEGMENT_SIZE):
             self.walls.append(Wall(0,y,SEGMENT_SIZE,SEGMENT_SIZE))
             self.walls.append(Wall(SCREEN_WIDTH-SEGMENT_SIZE, y, SEGMENT_SIZE, SEGMENT_SIZE))
-    
+
+# The spawn_fruit function chooses a random x and y coordinate using the randrange function. Anywhere thats within the screen boundaries, but not within the wall. 
     def spawn_fruit(self):
         x = random.randrange(SEGMENT_SIZE, SCREEN_WIDTH-SEGMENT_SIZE, SEGMENT_SIZE)
         y = random.randrange(SEGMENT_SIZE, SCREEN_HEIGHT-SEGMENT_SIZE, SEGMENT_SIZE)
         self.fruit = Fruit(x,y)
 
+# show_score renders the text Score: {self.score} Up on the top of the screen in a random color. 
     def show_score(self):
         text = self.font.render(f"Score: {self.score}",True,self.score_color)
         self.screen.blit(text,(10,10))
-        
 
+# The event_handler program... handles events. Key presses modify directions, and QUIT quits the game. 
     def event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -56,17 +69,16 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     self.snake.change_direction("right")
-
                 elif event.key == pygame.K_LEFT:
                     self.snake.change_direction("left")
-
                 elif event.key == pygame.K_UP:
                     self.snake.change_direction("up")
-
                 elif event.key == pygame.K_DOWN:
                     self.snake.change_direction("down")
 
-
+# The update function. First htis checks for collisions in the current game state of the world. Did the head hit the body? Did the head hit the walls? If so,
+# we set the game_over tag to true. If the snake head collided with fruit, then we run the setter function for the growth flag, increase score by 1, and spawn a new fruit.
+# If we didnt hit the fruit, then we just update the snake. Easy.
     def update(self):
         if self.snake.collide_self():
             self.game_over=True
@@ -80,44 +92,60 @@ class Game:
         else: 
             self.snake.update()
 
+# The draw function first sets the data to display to user, and then at the very end uses display.flip to render that data to a visible format.
+# First things first, if the game_over flag is set, we jump straight to show_game_over(). That function will be discussed later. For now, 
+# if the game_over boolean is not set, then we simply fill the screen with the background color, and then call every object's draw function:
+# snake, walls fruit. Then the score displays itself.
+# Finally, pygame.display.flip shows the user the new display.
+
     def draw(self):
         if self.game_over:
             self.show_game_over()
         else:
-            self.screen.fill((0,0,0))
+            self.screen.fill(BACKGROUND_COLOR)
             self.snake.draw(self.screen)
-
             for wall in self.walls:
                 wall.draw(self.screen)
-
             self.fruit.draw(self.screen)
-
             self.show_score()
-
         pygame.display.flip()
 
+# The show_game_over function. If the flag was set, this function will be called. Rather than rendering and drawing the snake, the walls, fruit and score, that
+# is no longer necessary. Now we have a different set of drawing and rendering instructions.
+# We fill the screen with background color, then blit our image of the tombstone, in roughly the center of the screen.
+# we save 3 strings. score_text showing the users score. Thanks_text, thanking them, and quit_text, teaching them how to exit. They can stare at the art as long as they want.
+# We blit all 3 strings onto the screen at readable locations.
+# The True means "anti-aliasing". Feel free to modify.
+
     def show_game_over(self):
-        self.screen.fill((0,0,0))
+        self.screen.fill(BACKGROUND_COLOR)
         self.screen.blit(self.tombstone, (233,0))
-        score_text = self.smallfont.render(f"Your high score was {self.score}", True, (0,0,0))
-        thanks_text = self.smallfont.render(f"Thank you for playing my game.", True, (0,0,0))
-        quit_text = self.smallfont.render(f"Press any key to exit.", True, (0,0,0))
+        score_text = self.smallfont.render(f"Your high score was {self.score}", True, FONT_COLOR)
+        thanks_text = self.smallfont.render(f"Thank you for playing my game.", True, FONT_COLOR)
+        quit_text = self.smallfont.render(f"Press any key to exit.", True, FONT_COLOR)
         self.screen.blit(score_text, (355, 325))
         self.screen.blit(thanks_text, (355, 350))
         self.screen.blit(quit_text, (355, 375))
 
+# death_check is a function with a simple use. After the tombstone is rendered, we want to wait for the user to press a key. So death_check
+# checks if the game_over flag is set, and if it is, it calls the event "Wait for event and then store that event, so we can refer to it".
+# With "press any key to exit," it wont be long before the user presses a key. At that point, event will be a KEYDOWN event, which will set
+# self.running to False, triggering a program close. This just allows the user to observe their score and show to their friends. 
     def death_check(self):
         if self.game_over:
             event = pygame.event.wait()
             if event.type == pygame.KEYDOWN:
                 self.running = False
 
-            
+# The run function just organizes things. death_check was the very last function built. Originally the work flow was check and handle user events, update the field
+# and then draw it. Now death_check sets a conditional branch: If its gameover, we're going to handle rendering, drawing, AND user input differently than before.   
+# The final command self.clock.tick(60),  sets the fps at 60 fps.
     def run(self):
         while self.running:
             self.death_check()
             self.event_handler()
             self.update()
             self.draw()
+
             self.clock.tick(60)
 
