@@ -149,6 +149,8 @@ class Game:
             event = pygame.event.wait()
             if event.type == pygame.KEYDOWN:
                 self.running = False
+            else:
+                self.death_check()
 
 # The run function just organizes things. death_check was the very last function built. Originally the work flow was check and handle user events, update the field
 # and then draw it. Now death_check sets a conditional branch: If its gameover, we're going to handle rendering, drawing, AND user input differently than before.   
