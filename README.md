@@ -2,6 +2,10 @@
 
 A snake game built on Python with Pygame.
 
+#Author Jemma Little
+With help from geeksforgeeks.com for teaching me the basics of Pygame
+https://www.geeksforgeeks.org/python/pygame-tutorial/
+
 #Requirements
 Python 3.12 
 Pygame 2.6.1
