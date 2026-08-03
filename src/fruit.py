@@ -1,7 +1,7 @@
-# We import pygame, GameObject parent class, and some constants from settings.
+# We GameObject parent class, and some constants from settings.
 from settings import SEGMENT_SIZE, random_color
 from game_object import GameObject
-import pygame
+
 
 #The Fruit Class. Imports but does not run the random_color() function until item initilization. Then fruit is always an exciting color.
 class Fruit(GameObject):
