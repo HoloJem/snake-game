@@ -2,7 +2,7 @@
 import pygame
 from game_object import GameObject
 import time
-from settings import SEGMENT_SIZE, OBJECT_COLOR, MOVEMENT_DELAY,SNAKE_COLOR
+from settings import SEGMENT_SIZE, MOVEMENT_DELAY,SNAKE_COLOR
 
 # Snake class. For the snake object the player controls. 
 # initializes as a game object with location, witdth and height SEGMENT_SIZE, and color OBJECT_COLOR.
@@ -12,6 +12,9 @@ from settings import SEGMENT_SIZE, OBJECT_COLOR, MOVEMENT_DELAY,SNAKE_COLOR
 # The body segments are autonomous, and simply travel in locations the head has already visited.
 # the self.growth flag helps with growth. V1.0 had the fruit instantly make the snake bigger and it was difficult to control. The growth flag waits until next cycle 
 # before the snake grows, for 'smoother gameplay'.
+class SnakeSegment(GameObject):
+    def __init__(self,x,y):
+        super().__init__(x,y, SEGMENT_SIZE,SEGMENT_SIZE,SNAKE_COLOR)
 
 class Snake(GameObject):
     def __init__(self, position):
@@ -22,11 +25,14 @@ class Snake(GameObject):
         self.last_movement_time=time.time()
         self.movement_delay=MOVEMENT_DELAY
         self.body = [
-            (x,y),
-            (x-SEGMENT_SIZE,y),
-            (x-2*SEGMENT_SIZE,y)
+            SnakeSegment(x,y),
+            SnakeSegment(x-SEGMENT_SIZE,y),
+            SnakeSegment(x-2*SEGMENT_SIZE,y)
         ]
         self.growth=False
+# SnakeSegment represents a single chunk of snake body. The constructor assumes default width and heigth of SEGMENT_SIZE, and color of SNAKE_COLOR
+
+
 
 # the movement function is dependent upon self.direction. Initialized as right, the player can change this via key input.
 # direction is stored, and next movement cycle the head will "travel" one SEGMENT_SIZE in that direction.
@@ -34,16 +40,18 @@ class Snake(GameObject):
 # Next growth cycle, we will decide whether to "pop" the oldest segment, symbolizing movement, or "grow" the snake by retaining that last segment.
 
     def move(self):
-        head_x, head_y = self.body[0]
+        head = self.body[0]
+        x = head.x
+        y = head.y
         if self.direction == 'right':
-            head_x += SEGMENT_SIZE
+            x += SEGMENT_SIZE
         elif self.direction == 'left':
-            head_x -= SEGMENT_SIZE
+            x -= SEGMENT_SIZE
         elif self.direction == 'up':
-            head_y -= SEGMENT_SIZE
+            y -= SEGMENT_SIZE
         elif self.direction == 'down':
-            head_y += SEGMENT_SIZE
-        self.body.insert(0,(head_x, head_y))
+            y += SEGMENT_SIZE
+        self.body.insert(0,SnakeSegment(x, y))
 
 # The update function first checks if difference between 'current time' and 'last movement time' is greater than or equal to the movement delay.
 # if it is not, then it simply returns to the main function that called update, as it has nothing to do.
@@ -68,9 +76,9 @@ class Snake(GameObject):
 # Also, the head of the snake is the only portion of the snake worth tracking for collision detection as the "protagonist". If the head does not collide with a wall or
 # fruit, and the body follows the head, it logically follows we dont need to monitor the body, as it will travel in a 'safe' location.
 
-
     def head_as_rect(self):
-        return pygame.Rect(self.body[0][0], self.body[0][1], SEGMENT_SIZE, SEGMENT_SIZE)
+        head = self.body[0]
+        return pygame.Rect(head.x, head.y, SEGMENT_SIZE, SEGMENT_SIZE)
 
 # Other functions will eventually need a setter function for the snakes direction variable. This is that.    
     def change_direction(self, direction):
@@ -80,11 +88,13 @@ class Snake(GameObject):
 # Pygames rectangle class's built in draw function.        
     def draw(self, screen):
         for segment in self.body:
-            pygame.draw.rect(screen, self.color, (segment[0],segment[1],SEGMENT_SIZE,SEGMENT_SIZE))
+            segment.draw(screen)
 
-# Collide_self checks if the snake's head segment, is inside the list body [1,....]. It returns true or false.
+# Collide_self checks if the snake's head segment, is sharing the same coordinate as any chunk in list body [1,....]. It returns true or false.
     def collide_self(self):
-        return self.body[0] in self.body[1:]
+        head=self.body[0]
+        for segment in self.body[1:]:
+            return head.x==segment.x and head.y==segment.y
 
 # The grow function is a setter function for the snake's variable growth. 
     def grow(self):
