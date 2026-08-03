@@ -94,7 +94,9 @@ class Snake(GameObject):
     def collide_self(self):
         head=self.body[0]
         for segment in self.body[1:]:
-            return head.x==segment.x and head.y==segment.y
+            if head.x==segment.x and head.y==segment.y:
+                return True
+        return False
 
 # The grow function is a setter function for the snake's variable growth. 
     def grow(self):
